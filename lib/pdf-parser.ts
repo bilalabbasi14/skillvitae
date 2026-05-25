@@ -5,8 +5,8 @@ export async function extractPdfText(file: File): Promise<string> {
     // Dynamic import to bypass Next.js SSR build issues with pdfjs-dist Node dependencies
     const pdfjsLib = await import("pdfjs-dist");
     
-    // Set worker source to matched version CDN
-    pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/5.7.284/pdf.worker.min.mjs`;
+    // Set worker source to matched version CDN via jsDelivr npm mirror
+    pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@5.7.284/build/pdf.worker.min.mjs`;
 
     const arrayBuffer = await file.arrayBuffer();
     const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
