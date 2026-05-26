@@ -58,7 +58,7 @@ LinkedIn PDF text:
 ${pdfText}
 `;
 
-    const rawResponse = await callWithFallback(prompt, "groq");
+    const rawResponse = await callWithFallback(prompt, "gemini");
     
     // Clean up potential markdown code fences from the AI output
     const cleanJsonText = rawResponse.replace(/```json|```/gi, "").trim();

@@ -20,7 +20,7 @@ ${jobDescriptionText}
 Your task:
 1. Tailor the CV: Reorder and prioritize skills matching the JD. Reword bullet points in Experience and Projects to naturally include keywords from the JD without lying. Write a brand new targeted profile summary.
 2. Perform keyword gap analysis: Extract keywords present in both (matched), keywords in JD but missing in CV (missing), and suggest 2-3 rewrites for existing bullet points in the CV to incorporate some missing keywords naturally.
-3. Make a condensed Resume version (1 page): Select top 3 projects, top 8 skills, and a 2-line summary.
+3. Make a condensed Resume version (1 page): Select top 3 projects, top 24 skills (grouped by category), and a 2-line summary.
 4. Detect the role type: Classify as "industry" (default, e.g. corporate, software developer) or "academic" (e.g. research, academic position).
 5. Score the match: Provide a rough AI percentage score (0-100) representing how well the candidate aligns with the JD.
 
@@ -38,14 +38,14 @@ Return ONLY valid JSON matching this exact structure, with no markdown fences, n
       "summary": "New targeted summary matching the JD"
     },
     "skills": [
-      { "name": "React", "level": "advanced", "source": "github" }
+      { "name": "React.js", "level": "advanced", "source": "github", "category": "Frontend" }
     ],
     "projects": [
       {
         "name": "name",
         "cv_title": "title",
         "description": "description",
-        "tech": ["React"],
+        "tech": ["React.js"],
         "repo_url": "link",
         "highlights": ["highlights updated to match keywords"]
       }
@@ -73,7 +73,7 @@ Return ONLY valid JSON matching this exact structure, with no markdown fences, n
     "languages": [{ "name": "Language", "level": "Level" }]
   },
   "ats_keywords": {
-    "matched": ["React", "Node.js"],
+    "matched": ["React.js", "Node.js"],
     "missing": ["CI/CD", "Agile", "Jest"],
     "suggested_rewrites": [
       {
@@ -87,7 +87,7 @@ Return ONLY valid JSON matching this exact structure, with no markdown fences, n
       // Top 3 most relevant projects (objects from the projects array)
     ],
     "skills": [
-      // Top 8 most relevant skills (objects from the skills array)
+      // Top 24 most relevant skills (objects from the skills array, each including category, name, level, source)
     ],
     "summary": "Condensed 2-line targeted summary"
   },
@@ -96,7 +96,7 @@ Return ONLY valid JSON matching this exact structure, with no markdown fences, n
 }
 `;
 
-    const rawResponse = await callWithFallback(prompt, "groq");
+    const rawResponse = await callWithFallback(prompt, "gemini");
     
     // Clean up potential markdown code fences from the AI output
     const cleanJsonText = rawResponse.replace(/```json|```/gi, "").trim();

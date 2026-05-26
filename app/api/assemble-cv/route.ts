@@ -26,6 +26,17 @@ Key Requirements:
 - Ensure all project descriptions (from GitHub Analysis) sound natural, technical, and human (not AI-generated). Preserve the repository titles, URLs, highlights, and tech stacks.
 - Ensure all experience bullet points are written as impact statements (Action + Context + Result) if possible. Avoid generic resume phrases and words like "leveraged", "utilized", "spearheaded", "passionate", "detail-oriented".
 - Format all dates in Experience and Education consistently (e.g., "Jan 2023" or "2023").
+- Extract ALL skills comprehensively from the projects (descriptions, highlights, tech), work experiences, and pre-computed raw skills. Do not just output the few raw dependencies. Extract languages, frameworks, libraries, tools, database engines, mobile SDKs, design tools, testing methodologies, and architectural concepts mentioned or inferred.
+- Categorize each skill into one of these standard categories in the "category" field:
+  * "Languages" (e.g. JavaScript, Kotlin, Java, Python, C/C++, PHP, SQL, HTML, CSS, TypeScript)
+  * "Frontend" (e.g. React.js, Next.js, HTML5, CSS3, Tailwind CSS, XML (Android UI))
+  * "Backend" (e.g. Node.js, Express.js, REST APIs, FastAPI, scikit-learn)
+  * "Databases" (e.g. MySQL, PostgreSQL, Supabase, Firebase Realtime DB, SQLite)
+  * "Mobile" (e.g. Android (Kotlin/XML), Jetpack compose, Retrofit, Agora SDK)
+  * "Design & Prototyping" (e.g. Figma (UI/UX design, wireframing, prototyping))
+  * "Tools" (e.g. Git, GitHub, Firebase, Docker, Web Push API, Google Classroom API, Vercel, Clever Cloud, Streamlit)
+  * "Testing" (e.g. Black-Box & White-Box Testing, Unit Testing with JUnit, Jest, Cypress)
+  * "Concepts" (e.g. Offline-first architecture, PWA, API design, version control, real-time sync, AI/ML, OOP, Data Structures, ML pipelines, ensemble methods, NLP, Agile Methodology, system system, software architecture)
 - Return ONLY valid JSON matching this exact schema, with no markdown fences, no preamble, and no explanation:
 {
   "personal": {
@@ -38,14 +49,14 @@ Key Requirements:
     "summary": "Targeted professional summary"
   },
   "skills": [
-    { "name": "React", "level": "advanced", "source": "github" }
+    { "name": "React.js", "level": "advanced", "source": "github", "category": "Frontend" }
   ],
   "projects": [
     {
       "name": "exact repo name",
       "cv_title": "professional title for CV",
       "description": "one professional sentence describing what it does and why it matters",
-      "tech": ["React", "TypeScript"],
+      "tech": ["React.js", "TypeScript"],
       "repo_url": "URL to the repository",
       "highlights": ["achievement bullet 1", "achievement bullet 2"]
     }
@@ -78,7 +89,7 @@ Key Requirements:
 }
 `;
 
-    const rawResponse = await callWithFallback(prompt, "groq");
+    const rawResponse = await callWithFallback(prompt, "gemini");
     
     // Clean up potential markdown code fences from the AI output
     const cleanJsonText = rawResponse.replace(/```json|```/gi, "").trim();

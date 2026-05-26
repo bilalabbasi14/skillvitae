@@ -12,6 +12,7 @@ export interface CVSkill {
   name: string;
   level: "advanced" | "proficient" | "familiar" | "beginner";
   source: "github" | "linkedin" | "manual";
+  category?: string;
 }
 
 export interface CVProject {
@@ -74,7 +75,7 @@ export function flattenToResumeMode(cv: unknown): CVData {
   }
   const typedCV = cv as CVData;
 
-  // Sort skills by proficiency level first, then take the top 8
+  // Sort skills by proficiency level first, then take the top 24
   const sortedSkills = [...typedCV.skills].sort((a, b) => {
     const wA = LEVEL_WEIGHTS[a.level] || 0;
     const wB = LEVEL_WEIGHTS[b.level] || 0;
@@ -97,7 +98,7 @@ export function flattenToResumeMode(cv: unknown): CVData {
       ...typedCV.personal,
       summary: condensedSummary,
     },
-    skills: sortedSkills.slice(0, 8),
+    skills: sortedSkills.slice(0, 24),
     projects: slicedProjects,
   };
 }

@@ -22,6 +22,7 @@ export default function CVEditor({
   const [activeTab, setActiveTab] = useState<ActiveTab>("personal");
   const [newSkillName, setNewSkillName] = useState("");
   const [newSkillLevel, setNewSkillLevel] = useState<"advanced" | "proficient" | "familiar" | "beginner">("proficient");
+  const [newSkillCategory, setNewSkillCategory] = useState("Tools");
 
   const toggleTab = (tab: ActiveTab) => {
     setActiveTab(activeTab === tab ? null : tab);
@@ -150,6 +151,7 @@ export default function CVEditor({
       name: newSkillName.trim(),
       level: newSkillLevel,
       source: "manual",
+      category: newSkillCategory,
     };
 
     onChange({
@@ -621,12 +623,31 @@ export default function CVEditor({
                 />
               </div>
               <div>
+                <label htmlFor="new-skill-category" className="block text-[10px] text-zinc-500 mb-1">Category</label>
+                <select
+                  id="new-skill-category"
+                  value={newSkillCategory}
+                  onChange={(e) => setNewSkillCategory(e.target.value)}
+                  className="bg-zinc-900 border border-zinc-800 rounded-lg px-2 py-1 text-zinc-300 focus:outline-none focus:border-indigo-500 transition-colors"
+                >
+                  <option value="Languages">Languages</option>
+                  <option value="Frontend">Frontend</option>
+                  <option value="Backend">Backend</option>
+                  <option value="Databases">Databases</option>
+                  <option value="Mobile">Mobile</option>
+                  <option value="Design & Prototyping">Design & Prototyping</option>
+                  <option value="Tools">Tools</option>
+                  <option value="Testing">Testing</option>
+                  <option value="Concepts">Concepts</option>
+                </select>
+              </div>
+              <div>
                 <label htmlFor="new-skill-level" className="block text-[10px] text-zinc-500 mb-1">Proficiency</label>
                 <select
                   id="new-skill-level"
                   value={newSkillLevel}
                   onChange={(e) => setNewSkillLevel(e.target.value as any)}
-                  className="bg-zinc-900 border border-zinc-800 rounded-lg px-2 py-1 text-zinc-300"
+                  className="bg-zinc-900 border border-zinc-800 rounded-lg px-2 py-1 text-zinc-300 focus:outline-none focus:border-indigo-500 transition-colors"
                 >
                   <option value="beginner">Beginner</option>
                   <option value="familiar">Familiar</option>
@@ -636,7 +657,7 @@ export default function CVEditor({
               </div>
               <button
                 type="submit"
-                className="bg-indigo-600 hover:bg-indigo-500 px-4 py-1 rounded-lg text-white font-semibold cursor-pointer"
+                className="bg-indigo-600 hover:bg-indigo-500 px-4 py-1 rounded-lg text-white font-semibold cursor-pointer h-[28px]"
               >
                 Add
               </button>
@@ -646,16 +667,68 @@ export default function CVEditor({
               💡 Tip: Click any skill tag below to cycle its proficiency level.
             </p>
 
-            {/* Render Skill Tags */}
-            <div className="flex flex-wrap gap-2 pt-2">
-              {cv.skills?.map((skill, idx) => (
-                <SkillTag
-                  key={idx}
-                  skill={skill}
-                  onUpdateLevel={(level) => handleUpdateSkillLevel(idx, level)}
-                  onRemove={() => handleRemoveSkill(idx)}
-                />
-              ))}
+            {/* Render Skill Tags Grouped by Category */}
+            <div className="space-y-4 pt-2">
+              {[
+                "Languages",
+                "Frontend",
+                "Backend",
+                "Databases",
+                "Mobile",
+                "Design & Prototyping",
+                "Tools",
+                "Testing",
+                "Concepts"
+              ].map(category => {
+                const catSkills = cv.skills.filter(s => s.category === category);
+                if (catSkills.length === 0) return null;
+                return (
+                  <div key={category} className="space-y-1.5 p-3 rounded-lg border border-zinc-850/60 bg-zinc-900/10">
+                    <h4 className="text-[10px] font-bold text-indigo-400 uppercase tracking-wider">{category}</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {cv.skills.map((skill, idx) => {
+                        if (skill.category !== category) return null;
+                        return (
+                          <SkillTag
+                            key={idx}
+                            skill={skill}
+                            onUpdateLevel={(level) => handleUpdateSkillLevel(idx, level)}
+                            onRemove={() => handleRemoveSkill(idx)}
+                          />
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
+              
+              {/* Other/Uncategorized Skills */}
+              {(() => {
+                const standardCategories = [
+                  "Languages", "Frontend", "Backend", "Databases", "Mobile",
+                  "Design & Prototyping", "Tools", "Testing", "Concepts"
+                ];
+                const hasUncategorized = cv.skills.some(s => !s.category || !standardCategories.includes(s.category));
+                if (!hasUncategorized) return null;
+                return (
+                  <div className="space-y-1.5 p-3 rounded-lg border border-zinc-850/60 bg-zinc-900/10">
+                    <h4 className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Other Skills</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {cv.skills.map((skill, idx) => {
+                        if (skill.category && standardCategories.includes(skill.category)) return null;
+                        return (
+                          <SkillTag
+                            key={idx}
+                            skill={skill}
+                            onUpdateLevel={(level) => handleUpdateSkillLevel(idx, level)}
+                            onRemove={() => handleRemoveSkill(idx)}
+                          />
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
           </div>
         )}

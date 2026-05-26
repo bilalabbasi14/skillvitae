@@ -241,42 +241,50 @@ const CVPreview = forwardRef<CVPreviewRef, CVPreviewProps>(function CVPreview(
         checkPageSpace(15);
         doc.setFontSize(11);
         doc.setFont(fontName, "bold");
-        doc.text(template === "ats-safe" ? "SKILLS" : "Technical Skills & Competencies", margin, y);
+        doc.text(template === "ats-safe" ? "SKILLS" : "Technical Skills", margin, y);
         y += 6;
 
         doc.setFontSize(9.5);
         doc.setFont(fontName, "normal");
-        
-        // For ATS-safe, print as a clean comma-separated list
-        if (template === "ats-safe") {
-          const skillsList = cv.skills.map(s => `${s.name} (${s.level})`).join(", ");
-          const skillsLines = doc.splitTextToSize(skillsList, printableWidth);
-          const skillsHeight = skillsLines.length * 4.5;
-          checkPageSpace(skillsHeight);
-          doc.text(skillsLines, margin, y);
-          y += skillsHeight + 6;
-        } else {
-          // Group by level
-          const groups: Record<string, string[]> = {};
-          for (const s of cv.skills) {
-            if (!groups[s.level]) groups[s.level] = [];
-            groups[s.level].push(s.name);
-          }
 
-          for (const level of ["advanced", "proficient", "familiar", "beginner"]) {
-            if (groups[level] && groups[level].length > 0) {
-              checkPageSpace(8);
-              doc.setFont(fontName, "bold");
-              doc.text(`${level.toUpperCase()}:`, margin, y);
-              doc.setFont(fontName, "normal");
-              const lineStr = groups[level].join(", ");
-              const splitLine = doc.splitTextToSize(lineStr, printableWidth - 25);
-              doc.text(splitLine, margin + 25, y);
-              y += splitLine.length * 4.5 + 1;
-            }
-          }
-          y += 4;
+        const categoriesOrder = [
+          "Languages",
+          "Frontend",
+          "Backend",
+          "Databases",
+          "Mobile",
+          "Design & Prototyping",
+          "Tools",
+          "Testing",
+          "Concepts"
+        ];
+
+        // Group by category
+        const groups: Record<string, string[]> = {};
+        for (const s of cv.skills) {
+          const cat = s.category || "Other";
+          if (!groups[cat]) groups[cat] = [];
+          groups[cat].push(s.name);
         }
+
+        const presentCategories = categoriesOrder.filter(c => groups[c] && groups[c].length > 0);
+        for (const cat of Object.keys(groups)) {
+          if (!categoriesOrder.includes(cat) && groups[cat].length > 0) {
+            presentCategories.push(cat);
+          }
+        }
+
+        for (const cat of presentCategories) {
+          checkPageSpace(8);
+          doc.setFont(fontName, "bold");
+          doc.text(`${cat}:`, margin, y);
+          doc.setFont(fontName, "normal");
+          const lineStr = groups[cat].join(", ");
+          const splitLine = doc.splitTextToSize(lineStr, printableWidth - 35);
+          doc.text(splitLine, margin + 35, y);
+          y += splitLine.length * 4.5 + 1.5;
+        }
+        y += 3;
       }
 
       if (sectionId === "certifications" && cv.certifications?.length > 0) {
@@ -484,29 +492,46 @@ const CVPreview = forwardRef<CVPreviewRef, CVPreviewProps>(function CVPreview(
             }
 
             if (sectionId === "skills" && cv.skills?.length > 0) {
+              const categoriesOrder = [
+                "Languages",
+                "Frontend",
+                "Backend",
+                "Databases",
+                "Mobile",
+                "Design & Prototyping",
+                "Tools",
+                "Testing",
+                "Concepts"
+              ];
+
+              // Group by category
+              const groups: Record<string, string[]> = {};
+              for (const s of cv.skills) {
+                const cat = s.category || "Other";
+                if (!groups[cat]) groups[cat] = [];
+                groups[cat].push(s.name);
+              }
+
+              const presentCategories = categoriesOrder.filter(c => groups[c] && groups[c].length > 0);
+              for (const cat of Object.keys(groups)) {
+                if (!categoriesOrder.includes(cat) && groups[cat].length > 0) {
+                  presentCategories.push(cat);
+                }
+              }
+
               return (
                 <div key={sectionId} className="mb-5">
                   <h2 className="text-sm font-bold text-zinc-950 tracking-wide uppercase mb-2 border-b border-zinc-200 pb-0.5">
                     {template === "ats-safe" ? "SKILLS" : "Technical Skills"}
                   </h2>
-                  {template === "ats-safe" ? (
-                    <p className="text-zinc-700 text-xs leading-relaxed">
-                      {cv.skills.map(s => `${s.name} (${s.level})`).join(", ")}
-                    </p>
-                  ) : (
-                    <div className="space-y-1.5 text-xs text-zinc-700">
-                      {["advanced", "proficient", "familiar", "beginner"].map(level => {
-                        const levelSkills = cv.skills.filter(s => s.level === level);
-                        if (levelSkills.length === 0) return null;
-                        return (
-                          <div key={level} className="flex gap-2">
-                            <span className="font-bold text-zinc-900 capitalize w-20 shrink-0">{level}:</span>
-                            <span>{levelSkills.map(s => s.name).join(", ")}</span>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
+                  <div className="space-y-1 text-xs text-zinc-700">
+                    {presentCategories.map(cat => (
+                      <div key={cat} className="flex gap-2">
+                        <span className="font-bold text-zinc-900 w-32 shrink-0">{cat}:</span>
+                        <span className="text-zinc-700">{groups[cat].join(", ")}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               );
             }

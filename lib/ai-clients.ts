@@ -5,7 +5,7 @@ export async function callGemini(prompt: string): Promise<string> {
   }
 
   const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -37,9 +37,10 @@ export async function callGroq(prompt: string): Promise<string> {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      model: "llama-3.1-8b-instant",
+      model: "llama-3.3-70b-versatile",
       messages: [{ role: "user", content: prompt }],
       temperature: 0.3,
+      max_tokens: 4096,
     }),
   });
 
@@ -67,6 +68,7 @@ export async function callOpenRouter(prompt: string): Promise<string> {
     body: JSON.stringify({
       model: "openrouter/free",
       messages: [{ role: "user", content: prompt }],
+      max_tokens: 4096,
     }),
   });
 
@@ -81,22 +83,31 @@ export async function callOpenRouter(prompt: string): Promise<string> {
 
 export async function callWithFallback(
   prompt: string,
-  primary: "groq" | "gemini" = "groq"
+  primary: "gemini" | "groq" = "gemini"
 ): Promise<string> {
-  try {
-    if (primary === "gemini") {
-      return await callGemini(prompt);
-    }
-    return await callGroq(prompt);
-  } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : String(err);
-    console.warn(`Primary AI client (${primary}) failed, falling back to OpenRouter. Error:`, message);
+  const order: ("gemini" | "groq" | "openrouter")[] =
+    primary === "gemini"
+      ? ["gemini", "groq", "openrouter"]
+      : ["groq", "gemini", "openrouter"];
+
+  let lastError = "";
+
+  for (const client of order) {
     try {
-      return await callOpenRouter(prompt);
-    } catch (orErr: unknown) {
-      const orMessage = orErr instanceof Error ? orErr.message : String(orErr);
-      throw new Error(`Both primary (${primary}) and fallback (OpenRouter) failed. Primary: ${message}. Fallback: ${orMessage}`);
+      if (client === "gemini") {
+        return await callGemini(prompt);
+      } else if (client === "groq") {
+        return await callGroq(prompt);
+      } else {
+        return await callOpenRouter(prompt);
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.warn(`${client} client failed. Falling back. Error:`, msg);
+      lastError = msg;
     }
   }
+
+  throw new Error(`All AI clients failed. Last error: ${lastError}`);
 }
 
