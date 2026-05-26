@@ -8,6 +8,7 @@ export default function LinkedInGuide() {
   return (
     <div className="w-full rounded-xl border border-zinc-200 bg-white/60 p-4 shadow-sm backdrop-blur-md transition-all duration-300 dark:border-zinc-800 dark:bg-zinc-950/60">
       <button
+        type="button"
         onClick={() => setIsOpen(!isOpen)}
         className="flex w-full items-center justify-between font-medium text-zinc-900 dark:text-zinc-100"
       >
