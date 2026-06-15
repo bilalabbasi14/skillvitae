@@ -127,6 +127,8 @@ export default function BuildingPage() {
           };
         });
 
+        const githubUrl = getItem<string>("sv_github_url") || "";
+
         // 5. Step 3: Assemble CV
         const cvAssemblyRes = await fetch("/api/assemble-cv", {
           method: "POST",
@@ -136,6 +138,7 @@ export default function BuildingPage() {
             linkedinData,
             userAnswers,
             skills,
+            githubUrl,
           }),
         });
 

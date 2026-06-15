@@ -26,6 +26,9 @@ export default function EditorPage() {
     "certifications",
     "languages",
   ]);
+  const [fontSize, setFontSize] = useState<"sm" | "md" | "lg">("md");
+  const [margins, setMargins] = useState<"compact" | "normal" | "wide">("normal");
+  const [density, setDensity] = useState<"compact" | "normal" | "loose">("normal");
 
   // JD text for ATS panel
   const [jdText, setJdText] = useState("");
@@ -49,12 +52,18 @@ export default function EditorPage() {
       template?: "ats-safe" | "classic" | "minimal";
       mode?: "resume" | "cv";
       sectionOrder?: string[];
+      fontSize?: "sm" | "md" | "lg";
+      margins?: "compact" | "normal" | "wide";
+      density?: "compact" | "normal" | "loose";
     }>("sv_settings");
 
     if (storedSettings) {
       if (storedSettings.template) setTemplate(storedSettings.template);
       if (storedSettings.mode) setMode(storedSettings.mode);
       if (storedSettings.sectionOrder) setSectionOrder(storedSettings.sectionOrder);
+      if (storedSettings.fontSize) setFontSize(storedSettings.fontSize);
+      if (storedSettings.margins) setMargins(storedSettings.margins);
+      if (storedSettings.density) setDensity(storedSettings.density);
     }
 
     setIsLoading(false);
@@ -78,8 +87,11 @@ export default function EditorPage() {
       template,
       mode,
       sectionOrder,
+      fontSize,
+      margins,
+      density,
     });
-  }, [template, mode, sectionOrder, isLoading]);
+  }, [template, mode, sectionOrder, fontSize, margins, density, isLoading]);
 
   const handleCVChange = (updated: CVData) => {
     setBaseCV(updated);
@@ -265,6 +277,12 @@ export default function EditorPage() {
             template={template}
             onChangeMode={setMode}
             onChangeTemplate={setTemplate}
+            fontSize={fontSize}
+            onChangeFontSize={setFontSize}
+            margins={margins}
+            onChangeMargins={setMargins}
+            density={density}
+            onChangeDensity={setDensity}
           />
 
           {/* ATS score checker widget */}
@@ -291,6 +309,9 @@ export default function EditorPage() {
             mode={mode}
             template={template}
             sectionOrder={sectionOrder}
+            fontSize={fontSize}
+            margins={margins}
+            density={density}
           />
         </div>
       </div>

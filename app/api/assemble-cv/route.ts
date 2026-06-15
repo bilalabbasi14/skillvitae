@@ -3,7 +3,7 @@ import { callWithFallback } from "../../../lib/ai-clients";
 
 export async function POST(request: Request) {
   try {
-    const { githubAnalysis, linkedinData, userAnswers, skills } = await request.json();
+    const { githubAnalysis, linkedinData, userAnswers, skills, githubUrl } = await request.json();
 
     const prompt = `Assemble a complete structured CV JSON by combining a user's GitHub repository analysis, LinkedIn profile data, custom profile entries, and pre-computed skills list.
 
@@ -20,10 +20,14 @@ ${JSON.stringify(userAnswers || {}, null, 2)}
 4. Pre-computed Skills:
 ${JSON.stringify(skills || [], null, 2)}
 
+5. User's GitHub Profile URL: "${githubUrl || ''}"
+
 Your task is to merge and polish this data into a professional CV.
 Key Requirements:
+- For the "personal.github" field, you MUST use the exact GitHub Profile URL provided above: "${githubUrl || ''}". Do NOT guess, alter, or generate any other GitHub URL.
+- DO NOT use markdown bold markers (e.g., "**keyword**" or "__keyword__") or asterisks anywhere in the generated text (such as summaries, experience bullets, project highlights, or descriptions) to highlight keywords. All output text must be clean, plain text.
 - Write a professional summary paragraph (in "personal.summary") targeted at the target role: "${userAnswers?.targetRole || 'Software Engineer'}". Make it 3-4 sentences, concise, and impact-oriented.
-- Ensure all project descriptions (from GitHub Analysis) sound natural, technical, and human (not AI-generated). Preserve the repository titles, URLs, highlights, and tech stacks.
+- Ensure all project descriptions (from GitHub Analysis) sound natural, technical, and human (not AI-generated). Keep 'cv_title' strictly to the clean project/product name. Do NOT append roles like 'Contributor', 'Developer', or extra slogans at the end. Preserve the repository titles, URLs, highlights, and tech stacks.
 - Ensure all experience bullet points are written as impact statements (Action + Context + Result) if possible. Avoid generic resume phrases and words like "leveraged", "utilized", "spearheaded", "passionate", "detail-oriented".
 - Format all dates in Experience and Education consistently (e.g., "Jan 2023" or "2023").
 - Extract ALL skills comprehensively from the projects (descriptions, highlights, tech), work experiences, and pre-computed raw skills. Do not just output the few raw dependencies. Extract languages, frameworks, libraries, tools, database engines, mobile SDKs, design tools, testing methodologies, and architectural concepts mentioned or inferred.

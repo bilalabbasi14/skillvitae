@@ -18,7 +18,7 @@ Job Description:
 ${jobDescriptionText}
 
 Your task:
-1. Tailor the CV: Reorder and prioritize skills matching the JD. Reword bullet points in Experience and Projects to naturally include keywords from the JD without lying. Write a brand new targeted profile summary.
+1. Tailor the CV: Reorder and prioritize skills matching the JD. Reword bullet points in Experience and Projects to naturally include keywords from the JD without lying. Keep project 'cv_title' strictly to the clean project/product name. Do NOT append roles like 'Contributor', 'Developer', or extra slogans at the end. Write a brand new targeted profile summary. Keep all personal details (name, email, phone, location, linkedin, github) exactly as they are in the Base CV; do not modify or replace them with placeholder text. DO NOT use markdown bold markers (e.g., "**keyword**" or "__keyword__") or asterisks anywhere in the generated summary, bullets, description, or other text fields to highlight tailored terms. Output everything as clean, plain text.
 2. Perform keyword gap analysis: Extract keywords present in both (matched), keywords in JD but missing in CV (missing), and suggest 2-3 rewrites for existing bullet points in the CV to incorporate some missing keywords naturally.
 3. Make a condensed Resume version (1 page): Select top 3 projects, top 24 skills (grouped by category), and a 2-line summary.
 4. Detect the role type: Classify as "industry" (default, e.g. corporate, software developer) or "academic" (e.g. research, academic position).

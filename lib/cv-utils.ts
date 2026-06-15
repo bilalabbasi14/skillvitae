@@ -69,6 +69,27 @@ const LEVEL_WEIGHTS = {
   beginner: 1,
 };
 
+export function cleanCVMarkdown(cv: CVData): CVData {
+  const cleanStr = (s?: string) => s ? s.replace(/\*\*/g, "") : "";
+  
+  return {
+    ...cv,
+    personal: {
+      ...cv.personal,
+      summary: cleanStr(cv.personal.summary),
+    },
+    experience: cv.experience.map(exp => ({
+      ...exp,
+      bullets: exp.bullets ? exp.bullets.map(b => cleanStr(b)) : [],
+    })),
+    projects: cv.projects.map(proj => ({
+      ...proj,
+      description: cleanStr(proj.description),
+      highlights: proj.highlights ? proj.highlights.map(h => cleanStr(h)) : [],
+    })),
+  };
+}
+
 export function flattenToResumeMode(cv: unknown): CVData {
   if (!validateCVShape(cv)) {
     throw new Error("Invalid CV shape");
@@ -82,8 +103,26 @@ export function flattenToResumeMode(cv: unknown): CVData {
     return wB - wA;
   });
 
-  // Limit projects to top 3
-  const slicedProjects = typedCV.projects.slice(0, 3);
+  // Limit projects to top 3, and highlights to top 2
+  const slicedProjects = typedCV.projects.slice(0, 3).map(proj => ({
+    ...proj,
+    highlights: proj.highlights ? proj.highlights.slice(0, 2) : [],
+  }));
+
+  // Limit experience to top 3, and bullets to top 3
+  const slicedExperience = typedCV.experience.slice(0, 3).map(exp => ({
+    ...exp,
+    bullets: exp.bullets ? exp.bullets.slice(0, 3) : [],
+  }));
+
+  // Limit education to top 1 (latest)
+  const slicedEducation = typedCV.education.slice(0, 1);
+
+  // Limit certifications to top 3
+  const slicedCertifications = typedCV.certifications ? typedCV.certifications.slice(0, 3) : [];
+
+  // Limit languages to top 3
+  const slicedLanguages = typedCV.languages ? typedCV.languages.slice(0, 3) : [];
 
   // Truncate summary to 2-3 sentences if it exists
   let condensedSummary = typedCV.personal.summary || "";
@@ -92,7 +131,7 @@ export function flattenToResumeMode(cv: unknown): CVData {
     condensedSummary = sentences.slice(0, 3).join(" ");
   }
 
-  return {
+  const resumeCV: CVData = {
     ...typedCV,
     personal: {
       ...typedCV.personal,
@@ -100,14 +139,20 @@ export function flattenToResumeMode(cv: unknown): CVData {
     },
     skills: sortedSkills.slice(0, 24),
     projects: slicedProjects,
+    experience: slicedExperience,
+    education: slicedEducation,
+    certifications: slicedCertifications,
+    languages: slicedLanguages,
   };
+
+  return cleanCVMarkdown(resumeCV);
 }
 
 export function flattenToCVMode(cv: unknown): CVData {
   if (!validateCVShape(cv)) {
     throw new Error("Invalid CV shape");
   }
-  return cv as CVData;
+  return cleanCVMarkdown(cv as CVData);
 }
 
 export function validateCVShape(cv: unknown): boolean {

@@ -17,7 +17,7 @@ Return ONLY valid JSON with no markdown, no preamble, no explanation. Use this e
   "projects": [
     {
       "repo_name": "exact repo name from input",
-      "cv_title": "professional title for CV",
+      "cv_title": "professional title for CV (e.g., 'SkillVitae' or 'E-Commerce Platform'). Keep it strictly to the clean application/project name. Do NOT append roles like 'Contributor', 'Developer', or extra slogans at the end.",
       "cv_description": "one professional sentence describing what it does and why it matters",
       "highlights": [
         "achievement bullet 1 (e.g. Optimized database queries reducing load times by 30%)",

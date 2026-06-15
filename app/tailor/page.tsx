@@ -5,9 +5,10 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import CVEditor from "../../components/editor/CVEditor";
 import CVPreview, { CVPreviewRef } from "../../components/editor/CVPreview";
+import TemplateSelector from "../../components/editor/TemplateSelector";
 import TailoringPanel from "../../components/tailor/TailoringPanel";
 import VersionSidebar, { TailoredVersion } from "../../components/tailor/VersionSidebar";
-import { CVData } from "../../lib/cv-utils";
+import { CVData, flattenToResumeMode, flattenToCVMode } from "../../lib/cv-utils";
 import { getItem, setItem } from "../../lib/storage";
 import { computeATSScore, extractKeywords, flattenCVToText } from "../../lib/ats";
 
@@ -57,6 +58,9 @@ export default function TailorPage() {
     "certifications",
     "languages",
   ]);
+  const [fontSize, setFontSize] = useState<"sm" | "md" | "lg">("md");
+  const [margins, setMargins] = useState<"compact" | "normal" | "wide">("normal");
+  const [density, setDensity] = useState<"compact" | "normal" | "loose">("normal");
 
   useEffect(() => {
     const storedBase = getItem<CVData>("sv_cv_base");
@@ -74,14 +78,33 @@ export default function TailorPage() {
       template?: "ats-safe" | "classic" | "minimal";
       mode?: "resume" | "cv";
       sectionOrder?: string[];
+      fontSize?: "sm" | "md" | "lg";
+      margins?: "compact" | "normal" | "wide";
+      density?: "compact" | "normal" | "loose";
     }>("sv_settings");
 
     if (storedSettings) {
       if (storedSettings.template) setTemplate(storedSettings.template);
       if (storedSettings.mode) setMode(storedSettings.mode);
       if (storedSettings.sectionOrder) setSectionOrder(storedSettings.sectionOrder);
+      if (storedSettings.fontSize) setFontSize(storedSettings.fontSize);
+      if (storedSettings.margins) setMargins(storedSettings.margins);
+      if (storedSettings.density) setDensity(storedSettings.density);
     }
   }, [router]);
+
+  // Save settings when they change
+  useEffect(() => {
+    if (!baseCV) return;
+    setItem("sv_settings", {
+      template,
+      mode,
+      sectionOrder,
+      fontSize,
+      margins,
+      density,
+    });
+  }, [template, mode, sectionOrder, fontSize, margins, density, baseCV]);
 
   const handleTailorSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -233,7 +256,6 @@ export default function TailorPage() {
   const handleSaveVersion = () => {
     if (!activeCV || !tailorResults) return;
 
-    const title = activeCV.personal?.summary?.slice(0, 30) || "Tailored Version";
     const compName = activeCV.experience?.[0]?.company || activeCV.personal?.name || "Company";
     
     const versionLabel = prompt(
@@ -303,9 +325,13 @@ export default function TailorPage() {
     setCompareData({ v1, v2 });
   };
 
+  // Pre-process active tailored CV data based on active mode
+  const activeCVData = activeCV ? (mode === "resume" ? flattenToResumeMode(activeCV) : flattenToCVMode(activeCV)) : null;
+  const baseCVData = baseCV ? (mode === "resume" ? flattenToResumeMode(baseCV) : flattenToCVMode(baseCV)) : null;
+
   // ATS Score calculations for panel
-  const originalATS = baseCV && fallbackJdText ? computeATSScore(baseCV, fallbackJdText) : 0;
-  const tailoredATS = activeCV && fallbackJdText ? computeATSScore(activeCV, fallbackJdText) : 0;
+  const originalATS = baseCVData && fallbackJdText ? computeATSScore(baseCVData, fallbackJdText) : 0;
+  const tailoredATS = activeCVData && fallbackJdText ? computeATSScore(activeCVData, fallbackJdText) : 0;
 
   return (
     <div className="relative min-h-screen bg-zinc-950 text-zinc-100 flex flex-col selection:bg-indigo-500 selection:text-white">
@@ -399,6 +425,12 @@ export default function TailorPage() {
                 </p>
               )}
 
+              {errorMsg && (
+                <p className="text-[11px] text-red-500 font-semibold">
+                  Error: {errorMsg}
+                </p>
+              )}
+
               <button
                 type="submit"
                 disabled={isLoading}
@@ -408,6 +440,22 @@ export default function TailorPage() {
               </button>
             </form>
           </div>
+
+          {/* Template/Layout settings */}
+          {activeCV && (
+            <TemplateSelector
+              mode={mode}
+              template={template}
+              onChangeMode={setMode}
+              onChangeTemplate={setTemplate}
+              fontSize={fontSize}
+              onChangeFontSize={setFontSize}
+              margins={margins}
+              onChangeMargins={setMargins}
+              density={density}
+              onChangeDensity={setDensity}
+            />
+          )}
 
           {/* CV Editor panel loaded with active tailored CV */}
           {activeCV && (
@@ -463,10 +511,13 @@ export default function TailorPage() {
               ) : (
                 <CVPreview
                   ref={previewRef}
-                  cv={activeCV}
+                  cv={activeCVData}
                   mode={mode}
                   template={template}
                   sectionOrder={sectionOrder}
+                  fontSize={fontSize}
+                  margins={margins}
+                  density={density}
                 />
               )}
             </>
