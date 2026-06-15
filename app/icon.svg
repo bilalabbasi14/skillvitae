@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+  <rect width="24" height="24" rx="6" fill="url(#bg-grad)" />
+  <!-- Document shape -->
+  <path d="M6 3h8.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V21a2 2 0 01-2 2H6a2 2 0 01-2-2V5a2 2 0 012-2z" fill="rgba(255,255,255,0.15)" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+  <!-- Folded corner -->
+  <path d="M14 3v5a1 1 0 001 1h5" stroke="rgba(255,255,255,0.6)" stroke-width="1.5" stroke-linecap="round" />
+  <!-- Code brackets -->
+  <path d="M10 12L7.5 15L10 18" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M14 12L16.5 15L14 18" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+  <defs>
+    <linearGradient id="bg-grad" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#6366f1" />
+      <stop offset="0.5" stop-color="#a855f7" />
+      <stop offset="1" stop-color="#4f46e5" />
+    </linearGradient>
+  </defs>
+</svg>

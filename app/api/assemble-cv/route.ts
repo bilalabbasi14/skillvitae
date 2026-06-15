@@ -95,8 +95,12 @@ Key Requirements:
 
     const rawResponse = await callWithFallback(prompt, "gemini");
     
-    // Clean up potential markdown code fences from the AI output
-    const cleanJsonText = rawResponse.replace(/```json|```/gi, "").trim();
+    let cleanJsonText = rawResponse.trim();
+    const firstBrace = cleanJsonText.indexOf("{");
+    const lastBrace = cleanJsonText.lastIndexOf("}");
+    if (firstBrace !== -1 && lastBrace !== -1) {
+      cleanJsonText = cleanJsonText.substring(firstBrace, lastBrace + 1);
+    }
     
     try {
       const parsedData = JSON.parse(cleanJsonText);
