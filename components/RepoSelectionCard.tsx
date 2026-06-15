@@ -22,30 +22,36 @@ export default function RepoSelectionCard({
 
   return (
     <label
-      className={`relative flex items-start gap-4 p-5 rounded-2xl border transition-all duration-200 cursor-pointer select-none ${
+      className={`relative flex items-start gap-4 p-5 rounded-2xl border transition-all duration-300 cursor-pointer select-none hover-lift group ${
         isChecked
-          ? "border-indigo-500 bg-indigo-500/5 shadow-md shadow-indigo-500/5"
-          : "border-zinc-800 bg-zinc-900/20 hover:border-zinc-700 hover:bg-zinc-900/40"
+          ? "border-indigo-500/50 bg-indigo-500/5 shadow-lg shadow-indigo-500/10"
+          : "border-zinc-800/50 bg-zinc-900/20 hover:border-zinc-700 hover:bg-zinc-900/40"
       } ${repo.fork ? "opacity-60 hover:opacity-80" : ""}`}
     >
-      {/* Checkbox placement */}
-      <div className="flex items-center h-5 mt-0.5">
+      {/* Animated glow on selection */}
+      {isChecked && (
+        <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-indigo-500/5 to-purple-500/5 animate-pulse-glow pointer-events-none" />
+      )}
+
+      {/* Checkbox */}
+      <div className="flex items-center h-5 mt-0.5 relative">
         <input
           type="checkbox"
           checked={isChecked}
           disabled={disabled && !isChecked}
           onChange={(e) => onChange(e.target.checked)}
-          className="h-4 w-4 rounded border-zinc-700 bg-zinc-950 text-indigo-600 focus:ring-indigo-500 disabled:opacity-50 cursor-pointer"
+          className="h-4 w-4 rounded border-zinc-700 bg-zinc-950 text-indigo-600 focus:ring-indigo-500 disabled:opacity-50 cursor-pointer transition-transform duration-200 checked:scale-110"
         />
       </div>
 
-      <div className="flex-1 min-w-0">
+      <div className="flex-1 min-w-0 relative">
         <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-          <h3 className="text-sm font-bold text-zinc-100 truncate max-w-[200px] sm:max-w-[280px]">
+          <h3 className={`text-sm font-bold truncate max-w-[200px] sm:max-w-[280px] transition-colors duration-300 ${
+            isChecked ? "text-indigo-300" : "text-zinc-100"
+          }`}>
             {repo.name}
           </h3>
-          
-          {/* Fork badge */}
+
           {repo.fork && (
             <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-zinc-800 text-zinc-400 border border-zinc-700">
               <svg className="h-3 w-3 mr-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
@@ -56,16 +62,16 @@ export default function RepoSelectionCard({
           )}
         </div>
 
-        {/* Repo Description */}
         <p className="text-xs text-zinc-400 line-clamp-2 mb-4 leading-normal min-h-[32px]">
           {repo.description || "No description provided."}
         </p>
 
-        {/* Repo Metadata */}
         <div className="flex items-center gap-4 text-[11px] text-zinc-500 font-medium">
           {repo.language && (
-            <span className="flex items-center gap-1">
-              <span className="h-2.5 w-2.5 rounded-full bg-indigo-500/80" />
+            <span className="flex items-center gap-1.5">
+              <span className={`h-2.5 w-2.5 rounded-full transition-colors duration-300 ${
+                isChecked ? "bg-indigo-400" : "bg-indigo-500/60"
+              }`} />
               {repo.language}
             </span>
           )}

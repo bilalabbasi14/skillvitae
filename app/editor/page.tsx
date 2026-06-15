@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import AnimatedLogo from "../../components/ui/AnimatedLogo";
+import LoadingScreen from "../../components/ui/LoadingScreen";
 import CVEditor from "../../components/editor/CVEditor";
 import CVPreview, { CVPreviewRef } from "../../components/editor/CVPreview";
 import ATSScorePanel from "../../components/editor/ATSScorePanel";
@@ -14,7 +16,6 @@ export default function EditorPage() {
   const router = useRouter();
   const previewRef = useRef<CVPreviewRef>(null);
 
-  // Core CV states
   const [baseCV, setBaseCV] = useState<CVData | null>(null);
   const [mode, setMode] = useState<"resume" | "cv">("resume");
   const [template, setTemplate] = useState<"ats-safe" | "classic" | "minimal">("ats-safe");
@@ -30,13 +31,8 @@ export default function EditorPage() {
   const [margins, setMargins] = useState<"compact" | "normal" | "wide">("normal");
   const [density, setDensity] = useState<"compact" | "normal" | "loose">("normal");
 
-  // JD text for ATS panel
   const [jdText, setJdText] = useState("");
-
-  // Mobile navigation tabs
   const [activeMobileTab, setActiveMobileTab] = useState<"edit" | "preview">("edit");
-
-  // Load initial settings
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -69,7 +65,6 @@ export default function EditorPage() {
     setIsLoading(false);
   }, [router]);
 
-  // Debounced auto-save base CV to localStorage
   useEffect(() => {
     if (!baseCV) return;
 
@@ -80,7 +75,6 @@ export default function EditorPage() {
     return () => clearTimeout(delayDebounce);
   }, [baseCV]);
 
-  // Save settings when they change
   useEffect(() => {
     if (isLoading) return;
     setItem("sv_settings", {
@@ -101,10 +95,9 @@ export default function EditorPage() {
     setJdText(text);
   };
 
-  // Export all localStorage backup data as a JSON file
   const handleExportJSON = () => {
     if (!baseCV) return;
-    
+
     const backupData = {
       sv_cv_base: baseCV,
       sv_settings: { template, mode, sectionOrder },
@@ -122,7 +115,6 @@ export default function EditorPage() {
     downloadAnchor.remove();
   };
 
-  // Import backup data from a JSON file
   const handleImportJSON = (e: React.ChangeEvent<HTMLInputElement>) => {
     const fileReader = new FileReader();
     if (e.target.files && e.target.files[0]) {
@@ -133,7 +125,7 @@ export default function EditorPage() {
           if (parsed.sv_cv_base) {
             setBaseCV(parsed.sv_cv_base);
             setItem("sv_cv_base", parsed.sv_cv_base);
-            
+
             if (parsed.sv_settings) {
               if (parsed.sv_settings.template) setTemplate(parsed.sv_settings.template);
               if (parsed.sv_settings.mode) setMode(parsed.sv_settings.mode);
@@ -167,65 +159,58 @@ export default function EditorPage() {
 
   if (isLoading || !baseCV) {
     return (
-      <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col items-center justify-center">
-        <div className="relative h-12 w-12 mb-4">
-          <div className="absolute inset-0 rounded-full border-4 border-zinc-800" />
-          <div className="absolute inset-0 rounded-full border-4 border-indigo-500 border-t-transparent animate-spin" />
-        </div>
-        <p className="text-sm text-zinc-400 font-medium">Loading profile editor...</p>
-      </div>
+      <LoadingScreen
+        variant="dna"
+        message="Loading profile editor..."
+        subtext="Preparing your CV workspace."
+      />
     );
   }
 
-  // Pre-process visual data based on active mode
   const activeCVData = mode === "resume" ? flattenToResumeMode(baseCV) : flattenToCVMode(baseCV);
 
   return (
     <div className="relative min-h-screen bg-zinc-950 text-zinc-100 flex flex-col selection:bg-indigo-500 selection:text-white">
       {/* Header bar */}
-      <header className="w-full bg-zinc-900/60 border-b border-zinc-900 backdrop-blur-md sticky top-0 z-50 px-6 py-4 flex flex-wrap items-center justify-between gap-4">
+      <header className="w-full glass-light sticky top-0 z-50 px-6 py-3.5 flex flex-wrap items-center justify-between gap-4 animate-slide-down">
         <div className="flex items-center gap-4">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="h-6 w-6 rounded bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center font-bold text-white text-xs">
-              SV
-            </div>
-            <span className="text-lg font-bold tracking-tight bg-gradient-to-r from-zinc-50 to-zinc-400 bg-clip-text text-transparent">
+          <Link href="/" className="flex items-center gap-2 group">
+            <AnimatedLogo size="sm" />
+            <span className="text-lg font-bold tracking-tight bg-gradient-to-r from-zinc-50 to-zinc-400 bg-clip-text text-transparent group-hover:from-indigo-300 group-hover:to-purple-300 transition-all duration-300">
               SkillVitae
             </span>
           </Link>
           <span className="hidden sm:inline h-4 w-[1px] bg-zinc-800" />
           <span className="hidden sm:inline text-xs text-zinc-400 font-medium">
-            Editing Profile: <strong className="text-zinc-200">{baseCV.personal?.name || "Untitled"}</strong>
+            Editing: <strong className="text-zinc-200">{baseCV.personal?.name || "Untitled"}</strong>
           </span>
         </div>
 
         <div className="flex items-center gap-2 flex-wrap">
-          {/* Export/Import Buttons */}
           <button
             onClick={handleExportJSON}
-            className="px-3.5 py-1.5 rounded-lg border border-zinc-800 bg-zinc-900/50 hover:bg-zinc-900 text-zinc-300 text-xs font-semibold cursor-pointer"
+            className="px-3.5 py-1.5 rounded-lg border border-zinc-800 bg-zinc-900/50 hover:bg-zinc-900 text-zinc-300 text-xs font-semibold cursor-pointer transition-all duration-300 hover:border-zinc-700"
             title="Download JSON profile backup"
           >
             Backup Profile
           </button>
-          
-          <label className="px-3.5 py-1.5 rounded-lg border border-zinc-800 bg-zinc-900/50 hover:bg-zinc-900 text-zinc-300 text-xs font-semibold cursor-pointer">
+
+          <label className="px-3.5 py-1.5 rounded-lg border border-zinc-800 bg-zinc-900/50 hover:bg-zinc-900 text-zinc-300 text-xs font-semibold cursor-pointer transition-all duration-300 hover:border-zinc-700">
             Restore Backup
             <input type="file" accept=".json" onChange={handleImportJSON} className="hidden" />
           </label>
 
           <button
             onClick={handleResetApp}
-            className="px-3.5 py-1.5 rounded-lg border border-red-950/20 bg-red-955/10 hover:bg-red-900/40 text-red-400 text-xs font-semibold cursor-pointer"
+            className="px-3.5 py-1.5 rounded-lg border border-red-900/30 bg-red-950/20 hover:bg-red-900/30 text-red-400 text-xs font-semibold cursor-pointer transition-all duration-300"
             title="Clear all local data and restart"
           >
             Reset
           </button>
 
-          {/* Download PDF Trigger */}
           <button
             onClick={() => previewRef.current?.downloadPDF()}
-            className="px-4 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold flex items-center gap-1 shadow-md shadow-indigo-600/10 cursor-pointer"
+            className="px-4 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold flex items-center gap-1.5 shadow-md shadow-indigo-600/10 cursor-pointer transition-all duration-300 hover:shadow-lg hover:shadow-indigo-500/20"
           >
             <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
               <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -233,21 +218,25 @@ export default function EditorPage() {
             Download PDF
           </button>
 
-          {/* Tailor navigation */}
           <Link
             href="/tailor"
-            className="px-4 py-1.5 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-xs font-bold shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/35 hover:scale-[1.02] active:scale-[0.98] transition-all"
+            className="relative px-4 py-1.5 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-xs font-bold shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/35 hover:scale-[1.02] active:scale-[0.98] transition-all overflow-hidden group"
           >
-            Tailor for Job
+            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" style={{
+              background: "linear-gradient(110deg, transparent 30%, rgba(255,255,255,0.15) 50%, transparent 70%)",
+              backgroundSize: "200% 100%",
+              animation: "shimmer 1.5s linear infinite",
+            }} />
+            <span className="relative z-10">Tailor for Job</span>
           </Link>
         </div>
       </header>
 
-      {/* Mobile Tab bar toggle */}
-      <div className="flex border-b border-zinc-900 bg-zinc-900/30 md:hidden sticky top-[65px] z-40">
+      {/* Mobile Tab bar */}
+      <div className="flex border-b border-zinc-900/50 bg-zinc-900/20 md:hidden sticky top-[57px] z-40 backdrop-blur-sm">
         <button
           onClick={() => setActiveMobileTab("edit")}
-          className={`flex-1 py-3 text-xs font-bold border-b-2 text-center transition-colors ${
+          className={`flex-1 py-3 text-xs font-bold border-b-2 text-center transition-all duration-300 ${
             activeMobileTab === "edit" ? "border-indigo-500 text-zinc-200 bg-zinc-900/50" : "border-transparent text-zinc-500"
           }`}
         >
@@ -255,7 +244,7 @@ export default function EditorPage() {
         </button>
         <button
           onClick={() => setActiveMobileTab("preview")}
-          className={`flex-1 py-3 text-xs font-bold border-b-2 text-center transition-colors ${
+          className={`flex-1 py-3 text-xs font-bold border-b-2 text-center transition-all duration-300 ${
             activeMobileTab === "preview" ? "border-indigo-500 text-zinc-200 bg-zinc-900/50" : "border-transparent text-zinc-500"
           }`}
         >
@@ -263,15 +252,14 @@ export default function EditorPage() {
         </button>
       </div>
 
-      {/* Main Workspace split */}
-      <div className="flex-1 flex overflow-hidden">
-        {/* Left column: Controls & Editor */}
+      {/* Main Workspace */}
+      <div className="flex-1 flex overflow-hidden animate-fade-in">
+        {/* Left column */}
         <div
-          className={`w-full md:w-[45%] flex flex-col border-r border-zinc-900 overflow-y-auto p-6 space-y-6 ${
+          className={`w-full md:w-[45%] flex flex-col border-r border-zinc-900/50 overflow-y-auto p-6 space-y-6 ${
             activeMobileTab === "edit" ? "block" : "hidden md:block"
           }`}
         >
-          {/* Template settings */}
           <TemplateSelector
             mode={mode}
             template={template}
@@ -285,10 +273,8 @@ export default function EditorPage() {
             onChangeDensity={setDensity}
           />
 
-          {/* ATS score checker widget */}
           <ATSScorePanel cv={activeCVData} initialJdText={jdText} onJdUpdate={handleJdUpdate} />
 
-          {/* Complete CV fields editor */}
           <CVEditor
             cv={baseCV}
             onChange={handleCVChange}
@@ -297,7 +283,7 @@ export default function EditorPage() {
           />
         </div>
 
-        {/* Right column: Live Paper Preview */}
+        {/* Right column */}
         <div
           className={`w-full md:w-[55%] bg-zinc-950 flex flex-col p-6 overflow-y-auto ${
             activeMobileTab === "preview" ? "block" : "hidden md:block"
