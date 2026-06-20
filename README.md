@@ -1,36 +1,77 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SkillVitae
+
+SkillVitae is an AI-powered CV and resume tailoring web application built with Next.js. It helps users construct a base professional profile and intelligently tailor their resumes to match specific job descriptions. By analyzing job requirements and identifying ATS (Applicant Tracking System) keywords, SkillVitae provides actionable insights, keyword gap analysis, and intelligent bullet point rewrites to maximize interview chances.
+
+## Features
+
+- **Base CV Management:** Create, store, and manage your foundational resume data.
+- **AI-Driven Job Tailoring:** Input a job posting URL (to automatically scrape the description) or paste the text directly. The AI engine aligns your experience with the job requirements.
+- **ATS Gap Analysis:** Instantly see which critical keywords from the job description are missing in your CV and which ones are successfully matched.
+- **Smart Rewriting Suggestions:** Get AI-suggested rewrites for your experience bullets and project highlights to better reflect the desired qualifications and action verbs.
+- **Version Tracking & Comparison:** Save multiple tailored versions of your CV for different job applications. Compare different versions side-by-side to review changes.
+- **Live PDF Preview & Export:** Preview your tailored resume in real-time. Customize the layout with various templates (ATS-safe, classic, minimal), adjust fonts, margins, and section order, and export directly to PDF.
+
+## Tech Stack
+
+- **Framework:** Next.js
+- **UI & Styling:** React, Tailwind CSS
+- **Language:** TypeScript
+- **PDF Generation:** jspdf
+- **Web Scraping (Job Descriptions):** cheerio
+- **Drag and Drop:** @dnd-kit
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+Ensure you have Node.js and npm (or yarn/pnpm/bun) installed on your machine.
+
+### Installation
+
+1. Clone the repository and navigate to the project directory:
+
+```bash
+git clone <repository-url>
+cd skillvitae
+```
+
+2. Install the dependencies:
+
+```bash
+npm install
+```
+
+### Environment Variables
+
+If there are required environment variables (e.g., for AI integrations or database connections), copy the `.env.example` to `.env.local` and populate the necessary keys:
+
+```bash
+cp .env.example .env.local
+```
+
+### Running the Development Server
+
+Start the local development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Project Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `app/`: Next.js App Router pages and API routes.
+  - `editor/`: Base CV editing workspace.
+  - `tailor/`: Job tailoring workspace with insights and live preview.
+  - `onboard/`: Initial onboarding flow for new users.
+- `components/`: Reusable React components for UI, editors, and previews.
+- `lib/`: Utility functions for CV processing, ATS scoring, and local storage management.
 
-## Learn More
+## Deployment
 
-To learn more about Next.js, take a look at the following resources:
+This application is deployed and optimized for hosting on Vercel, the platform from the creators of Next.js. The CI/CD pipeline automatically builds and deploys updates when pushed to the main repository.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## License
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This project is private and proprietary unless otherwise specified.
