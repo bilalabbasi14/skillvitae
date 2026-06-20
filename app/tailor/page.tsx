@@ -525,7 +525,7 @@ export default function TailorPage() {
               ) : (
                 <CVPreview
                   ref={previewRef}
-                  cv={activeCVData}
+                  cv={activeCVData!}
                   mode={mode}
                   template={template}
                   sectionOrder={sectionOrder}
