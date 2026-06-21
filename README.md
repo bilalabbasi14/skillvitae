@@ -78,11 +78,20 @@ This application is deployed and optimized for hosting on Vercel, the platform f
 ## Project Structure
 
 - `app/`: Next.js App Router pages and API routes.
+  - `api/`: API routes for backend tasks (e.g., CV assembly, integrations).
+  - `building/`: CV building workspace and templates.
   - `editor/`: Base CV editing workspace.
-  - `tailor/`: Job tailoring workspace with insights and live preview.
   - `onboard/`: Initial onboarding flow for parsing GitHub, LinkedIn, and PDF data.
+  - `select-repos/`: Workspace for selecting GitHub repositories to include.
+  - `tailor/`: Job tailoring workspace with insights and live preview.
+  - `test-github/`: Testing utilities for GitHub integration.
 - `components/`: Reusable React components for UI, editors, and previews.
+  - `editor/`: Components specific to the base CV editor.
+  - `onboard/`: Components for the onboarding flow.
+  - `tailor/`: Components for the job tailoring workspace.
+  - `ui/`: Generic reusable UI components (e.g., buttons, cards, animations).
 - `lib/`: Utility functions for CV processing, deterministic ATS scoring, API integrations, and local storage management.
+- `public/`: Static assets such as images and icons.
 
 ## License
 
